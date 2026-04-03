@@ -3,41 +3,30 @@ package com.gmartins.stocktracker.controller;
 import com.gmartins.stocktracker.controller.request.StockRequest;
 import com.gmartins.stocktracker.entity.Stock;
 import com.gmartins.stocktracker.entity.StockPurchase;
-import com.gmartins.stocktracker.repository.StockPurchaseRepository;
-import com.gmartins.stocktracker.repository.StockRepository;
+import com.gmartins.stocktracker.mapper.StockMapper;
+import com.gmartins.stocktracker.service.StockService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.util.Pair;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/stock")
 @RequiredArgsConstructor
 public class StockController {
 
-    private final StockRepository stockRepository;
-    private final StockPurchaseRepository stockPurchaseRepository;
+    private final StockService stockService;
 
     @PostMapping
-    public void savePurchase(@RequestBody StockRequest request) {
+    public ResponseEntity<Stock> savePurchase(@RequestBody StockRequest request) {
 
-        Stock stock = new Stock();
-        stock.setStock(request.getStock());
+        Pair<Stock, StockPurchase> stock = StockMapper.toStock(request);
+        Stock savedStock = stockService.savePurchase(stock.getFirst(), stock.getSecond());
 
-        StockPurchase stockPurchase = new StockPurchase();
-        stockPurchase.setPrice(request.getPrice());
-        stockPurchase.setQuantity(request.getQuantity());
-        stockPurchase.setDate(request.getDate());
-
-        StockPurchase saved = stockPurchaseRepository.save(stockPurchase);
-
-        stock.setPurchases(List.of(saved));
-
-        stockRepository.save(stock);
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedStock);
     }
-
-
 }
