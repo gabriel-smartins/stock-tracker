@@ -2,12 +2,14 @@ package com.gmartins.stocktracker.client.response;
 
 import lombok.*;
 
+import java.io.Serializable;
+
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString(of = {"regularMarketPrice"})
-public class BrapiStockDataResponse {
+public class BrapiStockDataResponse implements Serializable {
 
     private String symbol;
     private String currency;
