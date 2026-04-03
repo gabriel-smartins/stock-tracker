@@ -4,3 +4,8 @@ services:
     container_name: mongo4
     ports:
       - "27017:27017"
+  redis:
+    image: redis:alpine
+    container_name: redis_cache
+    ports:
+      - "6379:6379"
