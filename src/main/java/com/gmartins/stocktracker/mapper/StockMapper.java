@@ -1,5 +1,6 @@
 package com.gmartins.stocktracker.mapper;
 
+import com.gmartins.stocktracker.controller.request.StockAddPurchaseRequest;
 import com.gmartins.stocktracker.controller.request.StockRequest;
 import com.gmartins.stocktracker.entity.Stock;
 import com.gmartins.stocktracker.entity.StockPurchase;
@@ -24,6 +25,16 @@ public class StockMapper {
                 .build();
 
         return Pair.of(stock, stockPurchase);
+    }
+
+    public static StockPurchase toStockPurchase(StockAddPurchaseRequest request) {
+        return StockPurchase
+                .builder()
+                .id(request.getStockId())
+                .price(request.getPrice())
+                .quantity(request.getQuantity())
+                .date(request.getDate())
+                .build();
     }
 
 }
