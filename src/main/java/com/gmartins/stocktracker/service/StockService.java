@@ -1,13 +1,11 @@
 package com.gmartins.stocktracker.service;
 
-import com.gmartins.stocktracker.client.BrapiClient;
-import com.gmartins.stocktracker.client.response.BrapiStockResponse;
+import com.gmartins.stocktracker.client.response.BrapiStockDataResponse;
 import com.gmartins.stocktracker.entity.Stock;
 import com.gmartins.stocktracker.entity.StockPurchase;
 import com.gmartins.stocktracker.repository.StockPurchaseRepository;
 import com.gmartins.stocktracker.repository.StockRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -18,12 +16,9 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class StockService {
 
-    @Value("${stock.client.brapi.token}")
-    private String token;
-
     private final StockRepository stockRepository;
     private final StockPurchaseRepository stockPurchaseRepository;
-    private final BrapiClient brapiClient;
+    private final FindStockDetailService findStockDetailService;
 
     public Stock savePurchase(Stock stock, StockPurchase stockPurchase) {
         StockPurchase savedStockPurchase = stockPurchaseRepository.save(stockPurchase);
@@ -46,8 +41,11 @@ public class StockService {
         List<Stock> stocks = stockRepository.findAll();
 
         stocks.forEach(stock -> {
-            BrapiStockResponse brapiStockResponse = brapiClient.getStock(stock.getStock(), token);
-            stock.setPrice(BigDecimal.valueOf(brapiStockResponse.getResults().get(0).getRegularMarketPrice()));
+            Optional<BrapiStockDataResponse> brapiStockDetail = findStockDetailService
+                    .findBrapiStockDetail(stock.getStock());
+            stock.setPrice(BigDecimal
+                    .valueOf(brapiStockDetail
+                            .map(BrapiStockDataResponse::getRegularMarketPrice).orElse(0.0)));
         });
 
         return stocks;
