@@ -28,6 +28,6 @@ public class Stock {
     @DBRef
     private List<StockPurchase> purchases;
 
-    // private User user;
-
+    @DBRef
+    private User user;
 }
