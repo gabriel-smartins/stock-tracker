@@ -1,8 +1,10 @@
 package com.gmartins.stocktracker.service;
 
 import com.gmartins.stocktracker.client.response.BrapiStockDataResponse;
+import com.gmartins.stocktracker.config.SecurityContextData;
 import com.gmartins.stocktracker.entity.Stock;
 import com.gmartins.stocktracker.entity.StockPurchase;
+import com.gmartins.stocktracker.entity.User;
 import com.gmartins.stocktracker.repository.StockPurchaseRepository;
 import com.gmartins.stocktracker.repository.StockRepository;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +24,7 @@ public class StockService {
 
     public Stock savePurchase(Stock stock, StockPurchase stockPurchase) {
         StockPurchase savedStockPurchase = stockPurchaseRepository.save(stockPurchase);
+        stock.setUser(User.builder().id(SecurityContextData.getUserData().getUserId()).build());
         stock.setPurchases(List.of(savedStockPurchase));
         return stockRepository.save(stock);
     }

@@ -2,6 +2,7 @@ package com.gmartins.stocktracker.controller;
 
 import com.gmartins.stocktracker.controller.request.StockAddPurchaseRequest;
 import com.gmartins.stocktracker.controller.request.StockRequest;
+import com.gmartins.stocktracker.controller.response.StockResponse;
 import com.gmartins.stocktracker.entity.Stock;
 import com.gmartins.stocktracker.entity.StockPurchase;
 import com.gmartins.stocktracker.mapper.StockMapper;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 import static com.gmartins.stocktracker.mapper.StockMapper.toStockPurchase;
+import static com.gmartins.stocktracker.mapper.StockMapper.toStockResponse;
 
 @RestController
 @RequestMapping("/api/v1/stock")
@@ -24,11 +26,11 @@ public class StockController {
     private final StockService stockService;
 
     @PostMapping
-    public ResponseEntity<Stock> savePurchase(@RequestBody StockRequest request) {
+    public ResponseEntity<StockResponse> savePurchase(@RequestBody StockRequest request) {
         Pair<Stock, StockPurchase> stock = StockMapper.toStock(request);
         Stock savedStock = stockService.savePurchase(stock.getFirst(), stock.getSecond());
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedStock);
+        return ResponseEntity.status(HttpStatus.CREATED).body(toStockResponse(savedStock));
     }
 
     @PostMapping("/add")
