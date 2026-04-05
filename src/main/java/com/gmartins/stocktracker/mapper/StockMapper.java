@@ -2,10 +2,14 @@ package com.gmartins.stocktracker.mapper;
 
 import com.gmartins.stocktracker.controller.request.StockAddPurchaseRequest;
 import com.gmartins.stocktracker.controller.request.StockRequest;
+import com.gmartins.stocktracker.controller.response.StockResponse;
 import com.gmartins.stocktracker.entity.Stock;
 import com.gmartins.stocktracker.entity.StockPurchase;
 import lombok.experimental.UtilityClass;
 import org.springframework.data.util.Pair;
+
+import java.math.BigDecimal;
+import java.util.Objects;
 
 @UtilityClass
 public class StockMapper {
@@ -34,6 +38,21 @@ public class StockMapper {
                 .price(request.getPrice())
                 .quantity(request.getQuantity())
                 .date(request.getDate())
+                .build();
+    }
+
+    public static StockResponse toStockResponse(Stock stock) {
+        final Long quantity = stock.getPurchases().stream()
+                .map(StockPurchase::getQuantity)
+                .reduce(0L, Long::sum);
+        BigDecimal price = stock.getPurchases().get(0).getPrice();
+
+        return StockResponse.builder()
+                .id(stock.getId())
+                .stock(stock.getStock())
+                .price(price)
+                .quantity(quantity)
+                .total(Objects.nonNull(price) ? price.multiply(BigDecimal.valueOf(quantity)) : BigDecimal.ZERO)
                 .build();
     }
 
